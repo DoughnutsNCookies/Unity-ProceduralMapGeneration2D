@@ -393,8 +393,10 @@ MonoBehaviour:
   gridVisualizer: {fileID: 556886517}
   mapVisualizer: {fileID: 1950627907}
   startEdge: 2
-  exitEdge: 4
+  exitEdge: 1
   randomPlacement: 0
+  visualizeUsingPrefabs: 0
+  autoRepair: 1
   numberOfPieces: 5
   width: 10
   length: 10
@@ -429,6 +431,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startColor: {r: 0, g: 0.051581383, b: 1, a: 1}
   exitColor: {r: 1, g: 0.8998207, b: 0, a: 1}
+  roadStraight: {fileID: 919132149155446097, guid: 5a23194f56ecff74daea2b788f1c979b, type: 3}
+  roadTileCorner: {fileID: 919132149155446097, guid: b39c422862fcadf4b856b69b1e55d79f, type: 3}
+  tileEmpty: {fileID: 919132149155446097, guid: 39475c3354f8a4a40a2dc13aed2da708, type: 3}
+  startTile: {fileID: 919132149155446097, guid: 02fe2f8e76b9a9c42a0d1cb2d9e35d4b, type: 3}
+  exitTile: {fileID: 262880261857184867, guid: 978919852085c724f8fa98c2afbeb57c, type: 3}
+  environmentTiles:
+  - {fileID: 919132149155446097, guid: c0d07e2a8815cf5418528f904ebe0ef6, type: 3}
+  - {fileID: 919132149155446097, guid: c2c3f430d6567204990ae088665d11d8, type: 3}
+  - {fileID: 919132149155446097, guid: b2a763d7e4aefb54da98660e2652e0a6, type: 3}
+  - {fileID: 919132149155446097, guid: 0bbd15fc82cae4d45b43b04ba2596716, type: 3}
+  - {fileID: 919132149155446097, guid: 64ecba3e86c1f35418308d4080b387df, type: 3}
 --- !u!4 &1950627908
 Transform:
   m_ObjectHideFlags: 0
