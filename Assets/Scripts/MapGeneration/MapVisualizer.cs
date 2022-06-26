@@ -55,27 +55,98 @@ public class MapVisualizer : MonoBehaviour
                 {
                     cell.ObjectType = CellObjectType.Obstacle;
                 }
+                Direction previousDirection = Direction.None;
+                Direction nextDirection = Direction.None;
                 switch (cell.ObjectType)
                 {
                     case CellObjectType.Empty:
                         CreateIndicator(position, tileEmpty);
                         break;
                     case CellObjectType.Road:
-                        CreateIndicator(position, roadStraight);
+                        if (data.path.Count > 0)
+                        {
+                            previousDirection = GetDirectionOfPreviousCell(position, data);
+                            nextDirection = GetDirectionOfNextCell(position, data);
+                        }
+                        if (previousDirection == Direction.Down && nextDirection == Direction.Left || previousDirection == Direction.Left && nextDirection == Direction.Down)
+                            CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, -90, 0));
+                        if (previousDirection == Direction.Up && nextDirection == Direction.Right || previousDirection == Direction.Right && nextDirection == Direction.Up)
+                            CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, 90, 0));
+                        if (previousDirection == Direction.Right && nextDirection == Direction.Down || previousDirection == Direction.Down && nextDirection == Direction.Right)
+                            CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, 180, 0));
+                        if (previousDirection == Direction.Left && nextDirection == Direction.Up || previousDirection == Direction.Up && nextDirection == Direction.Left)
+                            CreateIndicator(position, roadTileCorner);
+                        if (previousDirection == Direction.Right && nextDirection == Direction.Left || previousDirection == Direction.Left && nextDirection == Direction.Right)
+                            CreateIndicator(position, roadStraight, Quaternion.Euler(0, 90, 0));
+                        if (previousDirection == Direction.Up && nextDirection == Direction.Down || previousDirection == Direction.Down && nextDirection == Direction.Up)
+                            CreateIndicator(position, roadStraight);
                         break;
                     case CellObjectType.Obstacle:
                         int randomIndex = Random.Range(0, environmentTiles.Length);
                         CreateIndicator(position, environmentTiles[randomIndex]);
                         break;
                     case CellObjectType.Start:
-                        CreateIndicator(position, startTile);
+                        if (data.path.Count > 0)
+                            nextDirection = GetDirectionFromVectors(data.path[0], position);
+                        if (nextDirection == Direction.Right || nextDirection == Direction.Left)
+                            CreateIndicator(position, startTile, Quaternion.Euler(0, 90, 0));
+                        else
+                            CreateIndicator(position, startTile);
                         break;
                     case CellObjectType.Exit:
-                        CreateIndicator(position, exitTile);
+                        if (data.path.Count > 0)
+                            previousDirection = GetDirectionOfPreviousCell(position, data);
+                        switch (previousDirection)
+                        {
+                            case Direction.Right:
+                                CreateIndicator(position, exitTile, Quaternion.Euler(0, 90, 0));
+                                break;
+                            case Direction.Left:
+                                CreateIndicator(position, exitTile, Quaternion.Euler(0, -90, 0));
+                                break;
+                            case Direction.Down:
+                                CreateIndicator(position, exitTile, Quaternion.Euler(0, 180, 0));
+                                break;
+                            default:
+                                CreateIndicator(position, exitTile);
+                                break;
+
+                        }
+                        break;
+                    default:
                         break;
                 }
             }
         }
+    }
+
+    private Direction GetDirectionOfNextCell(Vector3 position, MapData data)
+    {
+        int index = data.path.FindIndex(a => a == position);
+        var nextCellPosition = data.path[index + 1];
+        return GetDirectionFromVectors(nextCellPosition, position);
+    }
+
+    private Direction GetDirectionOfPreviousCell(Vector3 position, MapData data)
+    {
+        var index = data.path.FindIndex(a => a == position);
+        var previousCellPosition = Vector3.zero;
+        if (index > 0)
+            previousCellPosition = data.path[index - 1];
+        else
+            previousCellPosition = data.startPosition;
+        return GetDirectionFromVectors(previousCellPosition, position);
+    }
+
+    private Direction GetDirectionFromVectors(Vector3 positionToGoTo, Vector3 position)
+    {
+        if (positionToGoTo.x > position.x)
+            return Direction.Right;
+        else if (positionToGoTo.x < position.x)
+            return Direction.Left;
+        else if (positionToGoTo.z > position.z)
+            return Direction.Up;
+        return Direction.Down;
     }
 
     private void CreateIndicator(Vector3 position, GameObject prefab, Quaternion rotation = new Quaternion())

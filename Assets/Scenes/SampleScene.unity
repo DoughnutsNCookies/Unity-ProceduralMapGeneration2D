@@ -395,7 +395,7 @@ MonoBehaviour:
   startEdge: 2
   exitEdge: 1
   randomPlacement: 0
-  visualizeUsingPrefabs: 0
+  visualizeUsingPrefabs: 1
   autoRepair: 1
   numberOfPieces: 5
   width: 10
