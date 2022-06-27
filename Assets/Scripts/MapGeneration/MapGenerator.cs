@@ -26,10 +26,9 @@ public class MapGenerator : MonoBehaviour
     public void GenerateNewMap()
     {
         mapVisualizer.ClearMap();
-
         grid = new MapGrid(width, length);
-
         MapHelper.RandomlyChooseAndSetStartAndExit(grid, ref startPosition, ref exitPosition, randomPlacement, startEdge, exitEdge);
+
         map = new CandidateMap(grid, numberOfPieces);
         map.CreateMap(startPosition, exitPosition, autoRepair);
         mapVisualizer.VisualizeMap(grid, map.ReturnMapData(), visualizeUsingPrefabs);

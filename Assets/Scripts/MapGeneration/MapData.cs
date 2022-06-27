@@ -7,4 +7,6 @@ public struct MapData{
     public Vector3 startPosition;
     public Vector3 exitPosition;
     public List<Vector3> path;
+    public List<Vector3> cornersList;
+    public int cornersNearEachOther;
 }

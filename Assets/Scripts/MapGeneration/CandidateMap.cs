@@ -13,6 +13,9 @@ public class CandidateMap
     private List<KnightPiece> knightPiecesList;
     private List<Vector3> path = new List<Vector3>();
 
+    private List<Vector3> cornersList;
+    private int cornersNearEachOtherCount;
+
     public MapGrid Grid { get => grid; }
     public bool[] ObstaclesArray { get => obstaclesArray; }
 
@@ -36,9 +39,49 @@ public class CandidateMap
             Repair();
     }
 
-    private void FindPath()
+    public void FindPath()
     {
         this.path = Astar.GetPath(startPoint, exitPoint, obstaclesArray, grid);
+        this.cornersList = GetListOfCorners(this.path);
+        this.cornersNearEachOtherCount = CalculateCornersNearEachOther(this.cornersList);
+    }
+
+    private int CalculateCornersNearEachOther(List<Vector3> cornersList)
+    {
+        int cornersNearEachOther = 0;
+        for (int i = 0; i < cornersList.Count - 1; i++)
+        {
+            if (Vector3.Distance(cornersList[i], cornersList[i + 1]) <= 1)
+                cornersNearEachOther++;
+        }
+        return cornersNearEachOther;
+    }
+
+    private List<Vector3> GetListOfCorners(List<Vector3> path)
+    {
+        List<Vector3> pathWithStart = new List<Vector3>(path);
+        pathWithStart.Insert(0, startPoint);
+        List<Vector3> cornersPositions = new List<Vector3>();
+        if (pathWithStart.Count <= 0)
+            return cornersPositions;
+        for (int i = 0; i < pathWithStart.Count - 2; i++)
+        {
+            if (pathWithStart[i + 1].x > pathWithStart[i].x || pathWithStart[i + 1].x < pathWithStart[i].x)
+            {
+                if (pathWithStart[i + 2].z > pathWithStart[i + 1].z || pathWithStart[i + 2].z < pathWithStart[i + 1].z)
+                {
+                    cornersPositions.Add(pathWithStart[i + 1]);
+                }
+            }
+            else if (pathWithStart[i + 1].z > pathWithStart[i].z || pathWithStart[i + 1].z < pathWithStart[i].z)
+            {
+                if (pathWithStart[i + 2].x > pathWithStart[i + 1].x || pathWithStart[i + 2].x < pathWithStart[i + 1].x)
+                {
+                    cornersPositions.Add(pathWithStart[i + 1]);
+                }
+            }
+        }
+        return cornersPositions;
     }
 
     private bool CheckIfPositionCanBeObstacle(Vector3 position)
@@ -99,8 +142,10 @@ public class CandidateMap
             knightPiecesList = knightPiecesList,
             startPosition = startPoint,
             exitPosition = exitPoint,
-            path = this.path
-        };
+            path = this.path,
+            cornersList = this.cornersList,
+            cornersNearEachOther = this.cornersNearEachOtherCount
+    };
     }
 
     public List<Vector3> Repair()
@@ -137,5 +182,42 @@ public class CandidateMap
             }
         }
         return listOfObstaclesToRemove;
+    }
+
+    public bool IsObstacleAt(int i)
+    {
+        return obstaclesArray[i];
+    }
+
+    public void PlaceObstacle(int i, bool isObstacle)
+    {
+        obstaclesArray[i] = isObstacle;
+    }
+
+    public void AddMutation(double mutationRate)
+    {
+        int numItems = (int)(obstaclesArray.Length * mutationRate);
+        while (numItems > 0)
+        {
+            int randomIndex = Random.Range(0, obstaclesArray.Length);
+            obstaclesArray[randomIndex] = !obstaclesArray[randomIndex];
+            numItems--;
+        }
+    }
+
+    public CandidateMap DeepClone()
+    {
+        return new CandidateMap(this);
+    }
+
+    public CandidateMap(CandidateMap candidateMap)
+    {
+        this.grid = candidateMap.grid;
+        this.startPoint = candidateMap.startPoint;
+        this.exitPoint = candidateMap.exitPoint;
+        this.obstaclesArray = (bool[])candidateMap.obstaclesArray.Clone();
+        this.cornersList = new List<Vector3>(candidateMap.cornersList);
+        this.cornersNearEachOtherCount = candidateMap.cornersNearEachOtherCount;
+        this.path = new List<Vector3>(candidateMap.path);
     }
 }
