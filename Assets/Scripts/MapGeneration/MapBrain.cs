@@ -28,8 +28,8 @@ public class MapBrain : MonoBehaviour
     [SerializeField] private int fitnessCornerMin = 6;
     [SerializeField] private int fitnessCornerMax = 12;
     [SerializeField, Range(1, 3)] private int fitnessCornerWeight = 1;
-    [SerializeField, Range(1, 3)] private int fitnessNearestcornerWeight = 1;
-    [SerializeField, Range(0.3f, 1f)] private int fitnessObstacleWeight = 1;
+    [SerializeField, Range(1, 3)] private int fitnessNearcornerWeight = 1;
+    [SerializeField, Range(0.3f, 1f)] private float fitnessObstacleWeight = 1;
     [SerializeField, Range(1, 5)] private int fitnessPathWeight = 1;
 
     //Map Start Parameters
@@ -54,7 +54,6 @@ public class MapBrain : MonoBehaviour
     {
         mutationRatePercent = mutationRate / 100D;
         crossoverRatePercent = crossoverRate / 100D;
-        RunAlgorithm();
     }
 
     public void RunAlgorithm()
@@ -200,6 +199,7 @@ public class MapBrain : MonoBehaviour
             score -= fitnessCornerWeight * (cornersCount - fitnessCornerMax);
         else if (cornersCount < fitnessCornerMin)
             score -= fitnessCornerWeight * fitnessCornerMin;
+        score -= mapData.cornersNearEachOther * fitnessNearcornerWeight;
         return score;
     }
 }
